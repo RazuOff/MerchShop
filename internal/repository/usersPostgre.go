@@ -1,11 +1,18 @@
 package repository
 
-import "gorm.io/gorm"
+import (
+	"github.com/RazuOff/MerchShop/internal/models"
+	"gorm.io/gorm"
+)
 
 type UsersPostgre struct {
 	DB *gorm.DB
 }
 
-func NewUsersPostgre(db *gorm.DB) *UsersPostgre {
+func newUsersPostgre(db *gorm.DB) *UsersPostgre {
 	return &UsersPostgre{DB: db}
+}
+
+func (postgre *UsersPostgre) GetUserByUsername(username string) models.User {
+
 }

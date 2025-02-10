@@ -8,16 +8,16 @@ type Merch struct {
 }
 
 type TransactionsHistory struct {
-	ID        int `json:"id"`
-	SenderID  int `json:"sender_id"`
-	ReciverID int `json:"reciver_id"`
-	Coins     int `json:"coins"`
+	ID         int `json:"id"`
+	SenderID   int `json:"sender_id"`
+	ReceiverID int `json:"reciver_id"`
+	Coins      int `json:"coins"`
 }
 
 type User struct {
 	ID       int     `json:"id"`
-	Login    string  `json:"login"`
-	Password string  `json:"password"`
-	Coins    int     `gorm:"default:1000;check:coins >= 0" json:"coins"`
+	Login    string  `gorm:"unique;not null" json:"login"`
+	Password string  `gorm:"not null" json:"password"`
+	Coins    int     `gorm:"default:1000;check:coins >= 0;not null" json:"coins"`
 	Merch    []Merch `gorm:"many2many:user_merch;constraint:OnDelete:CASCADE;"`
 }

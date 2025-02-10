@@ -6,6 +6,6 @@ type TransactionsHistoryPostgre struct {
 	DB *gorm.DB
 }
 
-func NewTransactionsHistoryPostgre(db *gorm.DB) *TransactionsHistoryPostgre {
+func newTransactionsHistoryPostgre(db *gorm.DB) *TransactionsHistoryPostgre {
 	return &TransactionsHistoryPostgre{DB: db}
 }
