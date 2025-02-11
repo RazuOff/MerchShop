@@ -9,10 +9,22 @@ type UsersPostgre struct {
 	DB *gorm.DB
 }
 
-func newUsersPostgre(db *gorm.DB) *UsersPostgre {
+func NewUsersPostgre(db *gorm.DB) *UsersPostgre {
 	return &UsersPostgre{DB: db}
 }
 
-func (postgre *UsersPostgre) GetUserByUsername(username string) models.User {
+func (repo *UsersPostgre) GetUserByUsername(username string) (*models.User, error) {
+
+}
+func (repo *UsersPostgre) SetUser(username string, password string) (*models.User, error) {
+
+}
+func (repo *UsersPostgre) GetUserByID(userID int) (*models.User, error) {
+
+}
+func (repo *UsersPostgre) UpdateUser(user *models.User) error {
+
+}
+func (repo *UsersPostgre) GetUsernameByID(userID int) (string, error) {
 
 }
