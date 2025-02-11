@@ -8,8 +8,8 @@ import (
 )
 
 func (h *Handler) BuyItem(c *gin.Context) {
-	userID := c.GetString("id")
-	if userID == "" {
+	userID := c.GetInt("id")
+	if userID == 0 {
 		c.JSON(http.StatusInternalServerError, models.ErrorResponce{Errors: "context does not contains user ID"})
 		return
 	}
@@ -20,15 +20,10 @@ func (h *Handler) BuyItem(c *gin.Context) {
 		return
 	}
 
-	exist, err := h.coinService.BuyItem(itemName, userID)
+	err := h.coinService.BuyItem(itemName, userID)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, models.ErrorResponce{Errors: err.Error()})
-		return
-	}
-
-	if !exist {
-		c.JSON(http.StatusBadRequest, models.ErrorResponce{Errors: "this item does not exists"})
+		c.JSON(err.Code, models.ErrorResponce{Errors: err.TextError})
 		return
 	}
 

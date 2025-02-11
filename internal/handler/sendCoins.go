@@ -8,15 +8,15 @@ import (
 )
 
 type requestBody struct {
-	ToUser string `json:"toUser"`
-	Amount int    `json:"amount"`
+	ToUserLogin string `json:"toUser"`
+	Amount      int    `json:"amount"`
 }
 
 func (h *Handler) SendCoins(c *gin.Context) {
 	var body requestBody
 
-	userID := c.GetString("id")
-	if userID == "" {
+	userID := c.GetInt("id")
+	if userID == 0 {
 		c.JSON(http.StatusInternalServerError, models.ErrorResponce{Errors: "context does not contains user ID"})
 		return
 	}
@@ -26,8 +26,8 @@ func (h *Handler) SendCoins(c *gin.Context) {
 		return
 	}
 
-	if err := h.coinService.SendCoins(userID, body.ToUser, body.Amount); err != nil {
-		c.JSON(http.StatusInternalServerError, models.ErrorResponce{Errors: err.Error()})
+	if err := h.coinService.SendCoins(userID, body.ToUserLogin, body.Amount); err != nil {
+		c.JSON(err.Code, models.ErrorResponce{Errors: err.TextError})
 		return
 	}
 

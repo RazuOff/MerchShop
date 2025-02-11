@@ -9,15 +9,15 @@ import (
 
 func (h *Handler) GetInfo(c *gin.Context) {
 
-	userID := c.GetString("id")
-	if userID == "" {
+	userID := c.GetInt("id")
+	if userID == 0 {
 		c.JSON(http.StatusInternalServerError, models.ErrorResponce{Errors: "context does not contains user ID"})
 		return
 	}
 
 	resp, err := h.infoService.GenerateInfo(userID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, models.ErrorResponce{Errors: err.Error()})
+		c.JSON(err.Code, models.ErrorResponce{Errors: err.TextError})
 		return
 	}
 

@@ -2,22 +2,26 @@ package models
 
 type HistoryResponse struct {
 	Coins       int         `json:"coins"`
-	Inventory   []item      `json:"inventory"`
-	CoinHistory coinHistory `json:"coinHistory"`
+	Inventory   []Item      `json:"inventory"`
+	CoinHistory CoinHistory `json:"coinHistory"`
 }
 
-type item struct {
+type Item struct {
 	Type     string `json:"type"`
 	Quantity int    `json:"quantity"`
 }
 
-type coinHistory struct {
-	Received []transaction `json:"received"`
-	Sent     []transaction `json:"sent"`
+type CoinHistory struct {
+	Received []ReceivedTransaction `json:"received"`
+	Sent     []SentTransaction     `json:"sent"`
 }
 
-type transaction struct {
+type ReceivedTransaction struct {
 	FromUser string `json:"fromUser"`
-	ToUser   string `json:"toUser"`
 	Amount   int    `json:"amount"`
+}
+
+type SentTransaction struct {
+	ToUser string `json:"toUser"`
+	Amount int    `json:"amount"`
 }

@@ -8,18 +8,18 @@ import (
 )
 
 type Handler struct {
-	authService service.AuthService
-	infoService service.InfoService
-	coinService service.CoinService
+	authService service.Auth
+	infoService service.Info
+	coinService service.Coin
 
 	config *config.Config
 }
 
 func NewHandler(services *service.Service, config *config.Config) *Handler {
 	return &Handler{
-		authService: services.AuthService,
-		infoService: services.InfoService,
-		coinService: services.CoinService,
+		authService: services.Auth,
+		infoService: services.Info,
+		coinService: services.Coin,
 
 		config: config,
 	}

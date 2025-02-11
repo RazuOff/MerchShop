@@ -6,24 +6,24 @@ import (
 	"github.com/RazuOff/MerchShop/internal/repository"
 )
 
-type AuthService interface {
-	RegistrateOrLogin(username string, password string) (models.User, error)
-	GenerateToken(username string, userID int, config config.Config) (string, error)
+type Auth interface {
+	RegistrateOrLogin(username string, password string) (*models.User, *models.ServiceError)
+	GenerateToken(username string, userID int, config config.Config) (string, *models.ServiceError)
 }
 
-type InfoService interface {
-	GenerateInfo(userID string) (models.HistoryResponse, error)
+type Info interface {
+	GenerateInfo(userID int) (*models.HistoryResponse, *models.ServiceError)
 }
 
-type CoinService interface {
-	SendCoins(fromUserID string, toUserID string, amount int) error
-	BuyItem(itemName string, userID string) (bool, error)
+type Coin interface {
+	SendCoins(fromUserID int, toUserLogin string, amount int) *models.ServiceError
+	BuyItem(itemName string, userID int) *models.ServiceError
 }
 
 type Service struct {
-	AuthService
-	InfoService
-	CoinService
+	Auth
+	Info
+	Coin
 }
 
 func NewService(repo *repository.Repository) *Service {
