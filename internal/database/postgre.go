@@ -15,7 +15,7 @@ func NewPostgre(config *config.Config) (*gorm.DB, error) {
 		return nil, fmt.Errorf("database connect error: %w", err)
 	}
 
-	if err := db.AutoMigrate(&models.User{}, &models.Merch{}, &models.TransactionsHistory{}); err != nil {
+	if err := db.AutoMigrate(&models.User{}, &models.Merch{}, &models.UserMerch{}, &models.TransactionsHistory{}); err != nil {
 		return nil, fmt.Errorf("database connect error: %w", err)
 	}
 	db.Create(getTestMerchTable())

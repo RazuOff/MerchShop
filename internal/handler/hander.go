@@ -8,25 +8,30 @@ import (
 )
 
 type Handler struct {
-	authService service.Auth
-	infoService service.Info
-	coinService service.Coin
-
-	config *config.Config
+	service *service.Service
+	config  *config.Config
 }
 
 func NewHandler(services *service.Service, config *config.Config) *Handler {
 	return &Handler{
-		authService: services.Auth,
-		infoService: services.Info,
-		coinService: services.Coin,
-
-		config: config,
+		service: services,
+		config:  config,
 	}
 }
 
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.Default()
+
+	router.Use(func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+		c.Next()
+	})
 
 	auth := router.Group("/api")
 	{

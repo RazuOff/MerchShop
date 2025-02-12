@@ -26,7 +26,7 @@ func (h *Handler) SendCoins(c *gin.Context) {
 		return
 	}
 
-	if err := h.coinService.SendCoins(userID, body.ToUserLogin, body.Amount); err != nil {
+	if err := h.service.SendCoins(userID, body.ToUserLogin, body.Amount); err != nil {
 		c.JSON(err.Code, models.ErrorResponce{Errors: err.TextError})
 		return
 	}

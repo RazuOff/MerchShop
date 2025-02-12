@@ -19,7 +19,7 @@ func NewAuthService(repo *repository.Repository) *AuthService {
 
 func (service *AuthService) GenerateToken(username string, userID int, config config.Config) (string, *models.ServiceError) {
 
-	expirationTime := time.Now().Add(5 * time.Minute)
+	expirationTime := time.Now().Add(10 * time.Minute)
 	claims := &models.Claims{
 		ID:       userID,
 		Username: username,

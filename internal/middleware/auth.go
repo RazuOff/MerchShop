@@ -13,6 +13,12 @@ func AuthMiddleware(config config.Config) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenString := c.GetHeader("Authorization")
 
+		if tokenString == "" {
+			c.JSON(http.StatusUnauthorized, models.ErrorResponce{Errors: "Authorization is empty"})
+			c.Abort()
+			return
+		}
+
 		claims := &models.Claims{}
 		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
 			return config.JwtKey, nil

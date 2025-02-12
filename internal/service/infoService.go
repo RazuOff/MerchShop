@@ -15,6 +15,8 @@ func NewInfoService(repo *repository.Repository) *InfoService {
 
 func (service *InfoService) GenerateInfo(userID int) (*models.HistoryResponse, *models.ServiceError) {
 	var history models.HistoryResponse
+	history.CoinHistory = models.CoinHistory{Received: []models.ReceivedTransaction{}, Sent: []models.SentTransaction{}}
+	history.Inventory = []models.Item{}
 
 	user, err := service.repository.GetUserByID(userID)
 	if err != nil {
@@ -35,15 +37,24 @@ func (service *InfoService) GenerateInfo(userID int) (*models.HistoryResponse, *
 		if err != nil {
 			return nil, &models.ServiceError{TextError: err.Error(), Code: 500}
 		}
+		if count == 0 {
+			continue
+		}
+
 		history.Inventory = append(history.Inventory, models.Item{Type: merch.Name, Quantity: count})
 	}
 
 	transactionHistory, err := service.repository.GetUserHistory(user)
+	if err != nil {
+		return nil, &models.ServiceError{TextError: err.Error(), Code: 500}
+	}
 
-	//repos recievd coins
+	if len(transactionHistory) == 0 {
+		return &history, nil
+	}
 
-	var recievedTransactions []models.ReceivedTransaction
-	var sentedTransactions []models.SentTransaction
+	recievedTransactions := make(map[string]int)
+	sentedTransactions := make(map[string]int)
 
 	for _, transaction := range transactionHistory {
 		if transaction.ReceiverID == userID {
@@ -52,9 +63,7 @@ func (service *InfoService) GenerateInfo(userID int) (*models.HistoryResponse, *
 			if err != nil {
 				return nil, &models.ServiceError{TextError: err.Error(), Code: 500}
 			}
-
-			recievedTransactions = append(recievedTransactions,
-				models.ReceivedTransaction{FromUser: fromUser, Amount: transaction.Coins})
+			recievedTransactions[fromUser] += transaction.Coins
 		}
 
 		if transaction.SenderID == userID {
@@ -63,14 +72,17 @@ func (service *InfoService) GenerateInfo(userID int) (*models.HistoryResponse, *
 			if err != nil {
 				return nil, &models.ServiceError{TextError: err.Error(), Code: 500}
 			}
-
-			sentedTransactions = append(sentedTransactions,
-				models.SentTransaction{ToUser: toUser, Amount: transaction.Coins})
+			sentedTransactions[toUser] += transaction.Coins
 		}
 	}
 
-	history.CoinHistory.Received = recievedTransactions
-	history.CoinHistory.Sent = sentedTransactions
+	for fromUser, amount := range recievedTransactions {
+		history.CoinHistory.Received = append(history.CoinHistory.Received, models.ReceivedTransaction{FromUser: fromUser, Amount: amount})
+	}
+
+	for toUser, amount := range sentedTransactions {
+		history.CoinHistory.Sent = append(history.CoinHistory.Sent, models.SentTransaction{ToUser: toUser, Amount: amount})
+	}
 
 	return &history, nil
 }

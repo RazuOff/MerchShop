@@ -14,7 +14,7 @@ type Users interface {
 }
 
 type History interface {
-	UpdateHistory(history *models.TransactionsHistory) error
+	AddHistory(history *models.TransactionsHistory) error
 	GetUserHistory(user *models.User) ([]models.TransactionsHistory, error)
 }
 
@@ -32,5 +32,9 @@ type Repository struct {
 }
 
 func NewRepository(db *gorm.DB) *Repository {
-	return &Repository{}
+	return &Repository{
+		Users:   NewUsersPostgre(db),
+		History: NewTransactionsHistoryPostgre(db),
+		Merch:   NewMerchPostgre(db),
+	}
 }

@@ -23,13 +23,13 @@ func (h *Handler) Auth(c *gin.Context) {
 		return
 	}
 
-	user, err := h.authService.RegistrateOrLogin(creds.Username, creds.Password)
+	user, err := h.service.RegistrateOrLogin(creds.Username, creds.Password)
 	if err != nil {
 		c.JSON(err.Code, models.ErrorResponce{Errors: err.TextError})
 		return
 	}
 
-	token, err := h.authService.GenerateToken(creds.Username, user.ID, *h.config)
+	token, err := h.service.GenerateToken(creds.Username, user.ID, *h.config)
 	if err != nil {
 		c.JSON(err.Code, models.ErrorResponce{Errors: err.TextError})
 		return

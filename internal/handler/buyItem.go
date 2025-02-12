@@ -20,7 +20,7 @@ func (h *Handler) BuyItem(c *gin.Context) {
 		return
 	}
 
-	err := h.coinService.BuyItem(itemName, userID)
+	err := h.service.BuyItem(itemName, userID)
 
 	if err != nil {
 		c.JSON(err.Code, models.ErrorResponce{Errors: err.TextError})

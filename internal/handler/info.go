@@ -15,7 +15,7 @@ func (h *Handler) GetInfo(c *gin.Context) {
 		return
 	}
 
-	resp, err := h.infoService.GenerateInfo(userID)
+	resp, err := h.service.GenerateInfo(userID)
 	if err != nil {
 		c.JSON(err.Code, models.ErrorResponce{Errors: err.TextError})
 		return

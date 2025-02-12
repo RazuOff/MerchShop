@@ -25,6 +25,10 @@ func (service *CoinService) SendCoins(fromUserID int, toUserLogin string, amount
 		return &models.ServiceError{TextError: err.Error(), Code: 500}
 	}
 
+	if toUser == nil {
+		return &models.ServiceError{TextError: "ToUserLogin does not exists", Code: 400}
+	}
+
 	if fromUser.ID == toUser.ID {
 		return &models.ServiceError{TextError: "You cannot send coins to yourself", Code: 400}
 	}
@@ -50,7 +54,7 @@ func (service *CoinService) SendCoins(fromUserID int, toUserLogin string, amount
 	history.ReceiverID = toUser.ID
 	history.Coins = amount
 
-	if err = service.repository.UpdateHistory(&history); err != nil {
+	if err = service.repository.AddHistory(&history); err != nil {
 		return &models.ServiceError{TextError: err.Error(), Code: 500}
 	}
 
@@ -63,11 +67,12 @@ func (service *CoinService) BuyItem(itemName string, userID int) *models.Service
 		return &models.ServiceError{TextError: err.Error(), Code: 500}
 	}
 
+	if merch == nil {
+		return &models.ServiceError{TextError: "Merch is not found", Code: 400}
+	}
+
 	user, err := service.repository.GetUserByID(userID)
 	if err != nil {
-		return &models.ServiceError{TextError: err.Error(), Code: 500}
-	}
-	if err := service.repository.AddMerchToUser(merch, user); err != nil {
 		return &models.ServiceError{TextError: err.Error(), Code: 500}
 	}
 
