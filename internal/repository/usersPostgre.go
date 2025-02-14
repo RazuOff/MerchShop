@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/RazuOff/MerchShop/internal/models"
 	"gorm.io/gorm"
@@ -54,19 +55,33 @@ func (repo *UsersPostgre) GetUserByID(userID int) (*models.User, error) {
 	return &user, nil
 }
 
-func (repo *UsersPostgre) UpdateUser(user *models.User) error {
-	if user == nil {
-		return fmt.Errorf("user is nil")
+func (repo *UsersPostgre) UpdateUsers(users ...*models.User) error {
+	if len(users) == 0 {
+		return fmt.Errorf("users")
 	}
 
-	result := repo.DB.Model(&models.User{}).Where("id = ?", user.ID).Updates(user)
-	if result.Error != nil {
-		return fmt.Errorf("failed to update user: %v", result.Error)
-	}
+	tx := repo.DB.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+			panic(r)
+		}
+	}()
 
-	if result.RowsAffected == 0 {
-		return fmt.Errorf("no user found with ID %d", user.ID)
+	for _, user := range users {
+		result := tx.Model(&models.User{}).Where("id = ?", user.ID).Updates(user)
+		if result.Error != nil {
+			tx.Rollback()
+			return fmt.Errorf("failed to update user: %v", result.Error)
+		}
+
+		if result.RowsAffected == 0 {
+			log.Println(user.Coins)
+			tx.Rollback()
+			return fmt.Errorf("no user found with ID %d", user.ID)
+		}
 	}
+	tx.Commit()
 
 	return nil
 }

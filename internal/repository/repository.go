@@ -5,11 +5,13 @@ import (
 	"gorm.io/gorm"
 )
 
+//go:generate mockgen -source=repository.go -destination=mocks/mock.go
+
 type Users interface {
 	GetUserByUsername(username string) (*models.User, error)
 	SetUser(username string, password string) (*models.User, error)
 	GetUserByID(userID int) (*models.User, error)
-	UpdateUser(user *models.User) error
+	UpdateUsers(users ...*models.User) error
 	GetUsernameByID(userID int) (string, error)
 }
 
@@ -20,7 +22,7 @@ type History interface {
 
 type Merch interface {
 	GetMerchByName(itemName string) (*models.Merch, error)
-	AddMerchToUser(merch *models.Merch, user *models.User) error
+	BuyMerch(merch *models.Merch, user *models.User) error
 	GetUsersMerch(user *models.User) ([]models.Merch, error)
 	GetUserMerchAmount(user *models.User, merch *models.Merch) (int, error)
 }

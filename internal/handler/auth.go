@@ -7,17 +7,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type credentials struct {
+type Credentials struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
-type authResponce struct {
+type AuthResponce struct {
 	Token string `json:"token"`
 }
 
 func (h *Handler) Auth(c *gin.Context) {
-	var creds credentials
+	var creds Credentials
 	if err := c.BindJSON(&creds); err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponce{Errors: "Incorrect request body"})
 		return
@@ -35,5 +35,5 @@ func (h *Handler) Auth(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, authResponce{Token: token})
+	c.JSON(http.StatusOK, AuthResponce{Token: token})
 }

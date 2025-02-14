@@ -26,22 +26,50 @@ func (repo *MerchPostgre) GetMerchByName(itemName string) (*models.Merch, error)
 	return &merch, nil
 
 }
-func (repo *MerchPostgre) AddMerchToUser(merch *models.Merch, user *models.User) error {
+
+func (repo *MerchPostgre) BuyMerch(merch *models.Merch, user *models.User) error {
+
+	tx := repo.DB.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+			panic(r)
+		}
+	}()
+
 	var userMerch models.UserMerch
-	err := repo.DB.Where("user_id = ? AND merch_id = ?", user.ID, merch.ID).First(&userMerch).Error
+	err := tx.Where("user_id = ? AND merch_id = ?", user.ID, merch.ID).First(&userMerch).Error
 	if err == nil {
 		userMerch.Amount++
-		return repo.DB.Save(&userMerch).Error
+		if err := tx.Save(&userMerch).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
 	} else if err == gorm.ErrRecordNotFound {
-		return repo.DB.Create(&models.UserMerch{
+		userMerch = models.UserMerch{
 			UserID:  user.ID,
 			MerchID: merch.ID,
 			Amount:  1,
-		}).Error
+		}
+		if err := tx.Create(&userMerch).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	} else {
+		tx.Rollback()
+		return err
 	}
 
-	return err
+	user.Coins -= merch.Price
+	if err := tx.Save(user).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	tx.Commit()
+	return nil
 }
+
 func (repo *MerchPostgre) GetUsersMerch(user *models.User) ([]models.Merch, error) {
 	if user == nil {
 		return nil, fmt.Errorf("invalid user")

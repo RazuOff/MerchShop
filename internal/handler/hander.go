@@ -2,7 +2,6 @@ package handler
 
 import (
 	"github.com/RazuOff/MerchShop/internal/config"
-	"github.com/RazuOff/MerchShop/internal/middleware"
 	"github.com/RazuOff/MerchShop/internal/service"
 	"github.com/gin-gonic/gin"
 )
@@ -38,7 +37,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		auth.POST("/auth", h.Auth)
 	}
 
-	api := router.Group("/api", middleware.AuthMiddleware(*h.config))
+	api := router.Group("/api", h.AuthMiddleware())
 	{
 		api.GET("/info", h.GetInfo)
 		api.POST("/sendCoin", h.SendCoins)

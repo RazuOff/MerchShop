@@ -6,6 +6,8 @@ import (
 	"github.com/RazuOff/MerchShop/internal/repository"
 )
 
+//go:generate mockgen -source=service.go -destination=mocks/mock.go
+
 type Auth interface {
 	RegistrateOrLogin(username string, password string) (*models.User, *models.ServiceError)
 	GenerateToken(username string, userID int, config config.Config) (string, *models.ServiceError)

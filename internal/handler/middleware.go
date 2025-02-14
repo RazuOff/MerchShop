@@ -1,15 +1,14 @@
-package middleware
+package handler
 
 import (
 	"net/http"
 
-	"github.com/RazuOff/MerchShop/internal/config"
 	"github.com/RazuOff/MerchShop/internal/models"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 )
 
-func AuthMiddleware(config config.Config) gin.HandlerFunc {
+func (h *Handler) AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenString := c.GetHeader("Authorization")
 
@@ -21,7 +20,7 @@ func AuthMiddleware(config config.Config) gin.HandlerFunc {
 
 		claims := &models.Claims{}
 		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-			return config.JwtKey, nil
+			return h.config.JwtKey, nil
 		})
 
 		if err != nil {

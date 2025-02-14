@@ -49,7 +49,12 @@ func (service *AuthService) RegistrateOrLogin(username string, password string) 
 		}
 		return user, nil
 	} else {
-		return user, nil
+
+		if user.Password == password {
+			return user, nil
+		}
+		return nil, &models.ServiceError{TextError: "incorrect password", Code: 401}
+
 	}
 }
 

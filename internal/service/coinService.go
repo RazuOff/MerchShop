@@ -15,6 +15,10 @@ func NewCoinService(repo *repository.Repository) *CoinService {
 
 func (service *CoinService) SendCoins(fromUserID int, toUserLogin string, amount int) *models.ServiceError {
 
+	if amount <= 0 {
+		return &models.ServiceError{TextError: "amount needs to be greater then 0", Code: 400}
+	}
+
 	fromUser, err := service.repository.GetUserByID(fromUserID)
 	if err != nil {
 		return &models.ServiceError{TextError: err.Error(), Code: 500}
@@ -40,11 +44,7 @@ func (service *CoinService) SendCoins(fromUserID int, toUserLogin string, amount
 	fromUser.Coins -= amount
 	toUser.Coins += amount
 
-	if err = service.repository.UpdateUser(fromUser); err != nil {
-		return &models.ServiceError{TextError: err.Error(), Code: 500}
-	}
-
-	if err = service.repository.UpdateUser(toUser); err != nil {
+	if err = service.repository.UpdateUsers(fromUser, toUser); err != nil {
 		return &models.ServiceError{TextError: err.Error(), Code: 500}
 	}
 
@@ -77,16 +77,10 @@ func (service *CoinService) BuyItem(itemName string, userID int) *models.Service
 	}
 
 	if user.Coins-merch.Price < 0 {
-		return &models.ServiceError{TextError: "Not enought coins to buy this item ", Code: 400}
+		return &models.ServiceError{TextError: "Not enought coins to buy this item", Code: 400}
 	}
 
-	user.Coins -= merch.Price
-
-	if err := service.repository.AddMerchToUser(merch, user); err != nil {
-		return &models.ServiceError{TextError: err.Error(), Code: 500}
-	}
-
-	if err := service.repository.UpdateUser(user); err != nil {
+	if err := service.repository.BuyMerch(merch, user); err != nil {
 		return &models.ServiceError{TextError: err.Error(), Code: 500}
 	}
 
