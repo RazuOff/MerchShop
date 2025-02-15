@@ -21,6 +21,9 @@
 
 ## Проверка покрытия текстами
 
+![image](https://github.com/user-attachments/assets/b518763d-26e5-42f2-bc8d-f2be7605a69f)
+
+
 `go test ./... -coverprofile=coverage | Out-Null`
 
 `go tool cover -func=coverage | Select-String "total"`
