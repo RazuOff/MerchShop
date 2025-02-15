@@ -1,0 +1,40 @@
+version: "3.9"
+services:
+  app:
+    container_name: merchshop
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+    - DB_PORT=5432
+    - DB_USER=postgres
+    - DB_PASSWORD=admin
+    - DB_NAME=merchshop
+    - DB_HOST=db
+    - JWT_KEY=SeCrEt_KeY
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:15
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: merchshop
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U postgres -d shop'"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
