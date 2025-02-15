@@ -17,7 +17,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func Test_sendCoins(t *testing.T) {
+func TestSendCoinsIntegration(t *testing.T) {
 	db, err := database.NewTestDB()
 
 	require.NoError(t, err)
